@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Pagination from 'react-bootstrap/Pagination';
-import axios from 'axios'
+import {fetchAbilitesAndSprites, fetchDataFromApi} from "../scripts/FethchingData";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
 
@@ -9,28 +10,31 @@ function DisplayTable(pokemonData)
     return (
         <table key={1}>
             <thead>
-                <th>IMAGE</th>
-                <th>NAME</th>
-                <th>ABILITIES</th>
+                <tr>
+                    <th>IMAGE</th>
+                    <th>NAME</th>
+                    <th>ABILITIES</th>
+                </tr>
             </thead>
             <tbody key={1}>
                 {pokemonData.map((singlePokemon, id = 0) =>
                     {   
                         let abilities = [], ability = "";    
-                        for (let i = 0; i < singlePokemon.pokemonAbilities[0].length; i++) {
-                            //retrieve ability name
-                            ability = singlePokemon.pokemonAbilities[0][i].ability.name;
-                            //make first character uppercase
-                            ability = ability.charAt(0).toUpperCase() + ability.slice(1,ability.length);
-                            //add ability to list
-                            abilities.push(ability); 
-                        }   
-                        //convert list of abilities to string
-                        abilities = abilities.join(', ');
+                        abilities = singlePokemon.pokemonAbilities[0].map(abilityObj => {
+                            const abilityName = abilityObj.ability.name;
+                            return abilityName.charAt(0).toUpperCase() + abilityName.slice(1);
+                        }).join(', ');
                         return(
                             <tr key={id}>
-                                <td key={id+1}><img src={singlePokemon.sprite} alt={singlePokemon.name} /></td>
-                                <td key={id+2}>{singlePokemon.pokemonName}</td>
+                                <td key={id+1}>
+                                    <img data-tooltip-id="my-tooltip-1" src={singlePokemon.sprite} alt={singlePokemon.pokemonName} />
+                                    <ReactTooltip
+                                        id="my-tooltip-1"
+                                        place="top"
+                                        content="Dummy info"
+                                    />
+                                </td>
+                                <td key={id+2}>{singlePokemon.pokemonName.charAt(0).toUpperCase() + singlePokemon.pokemonName.slice(1,singlePokemon.pokemonName.length)}</td>
                                 <td key={id+3}>{abilities}</td>            
                             </tr>);
                     })
@@ -41,7 +45,6 @@ function DisplayTable(pokemonData)
  
 }
 
-
 function Table(){
     // data to be filled with pokemon info --> by default null
     var [pokemons, setPokemons] = React.useState(null);
@@ -49,50 +52,29 @@ function Table(){
     var [pokemonData, setPokemonData] = React.useState(null);
     //by default there's no pokemon data to display
     var [namesFetched, setNamesFetched] = React.useState(false);
+    //indicates data's ready to be displayed (full pokemon info)
     var [allDataFetched, setAllDataFetched] = React.useState(false);
     useEffect(() => {
-        
-        const fetchDataFromApi = async () => {
-            try {
-              const response = await axios.get(apiUrl); //this part fetches pokemon names and URLs to their info
-              
-              //run each pokemon url to get their abilities and images          
-              
-              setPokemons(response.data); //set data to 
-              setNamesFetched(true); // Set to true once data is fetched
-            } catch (error) {
-              console.error("Error fetching data from API:", error);
-            }
-          };
-          fetchDataFromApi();
+          fetchDataFromApi(apiUrl).then((response) =>
+          {
+            setPokemons(response.data);
+            setNamesFetched(true); // Set to true once data is fetched
+          }
+          );
         }, []);
+
       useEffect(() => {
         if (namesFetched)
         {
-            const fetchAbilitesAndSprites = async () => {
-                try{
-                    var tempPokemons = []
-                    for (let index = 0; index < pokemons.results.length; index++) {
-                        var name = pokemons.results[index].name;
-                        const responseNew = await axios.get(pokemons.results[index].url); 
-                        var object = {
-                            sprite: responseNew.data.sprites.front_default,
-                            pokemonName: name,
-                            pokemonAbilities : [responseNew.data.abilities]              
-                        }  
-                        tempPokemons.push(object);                       
-                    }
-                    setPokemonData(tempPokemons);
-                    setAllDataFetched(true);
+            fetchAbilitesAndSprites(pokemons.results).then((results) =>
+                {
+                    setPokemonData(results[0]);
+                    setAllDataFetched(results[1]);
                 }
-                catch(error){
-                    console.log("tu");   
-                }
-            }
-            fetchAbilitesAndSprites();
-        }
-        
+            );
+        }  
       }, [namesFetched]);
+
       return ( 
         <div>
              {namesFetched && allDataFetched ? 
@@ -107,7 +89,3 @@ function Table(){
 }
 
 export default Table;
-
-
-
-
