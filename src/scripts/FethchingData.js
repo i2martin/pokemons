@@ -1,9 +1,12 @@
 import axios from "axios";
 
 //runs the URL from fetchDataFromApi() and uses single pokemons' data
-async function fetchFullPokemonData(data) {
+async function fetchFullPokemonData(data, itemsPerPage) {
     try{
         var tempPokemons = []
+        var pages = [];
+        var singlePage = []; 
+        var count = 0;  
         for (let index = 0; index < data.length; index++) {
             var name = data[index].name;
             const responseNew = await axios.get(data[index].url); 
@@ -16,8 +19,13 @@ async function fetchFullPokemonData(data) {
               weight: responseNew.data.weight
             }  
           );                       
+        }             
+        for (let i = 0; i < tempPokemons.length; i += itemsPerPage) {
+          // Slice the tempPokemons array from the current index i up to i + itemsPerPage
+          // and push this sub-array into the pages array.
+          pages.push(tempPokemons.slice(i, i + itemsPerPage));
         }
-        return [tempPokemons, true];
+        return [pages, true];
     }
     catch(error){
         console.error("Problems reaching API endpoint." + error);   
@@ -34,4 +42,4 @@ async function fetchDataFromApi(apiUrl) {
 
   };
 
-export {fetchFullPokemonData as fetchAbilitesAndSprites, fetchDataFromApi};
+export {fetchFullPokemonData , fetchDataFromApi};

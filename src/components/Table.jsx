@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import {fetchAbilitesAndSprites, fetchDataFromApi} from "../scripts/FethchingData";
+import {fetchFullPokemonData, fetchDataFromApi} from "../scripts/FethchingData";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import LoadingSpinner from "./LoadingSpinner";
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
-const itemsPerPage = 3;
+const itemsPerPage = 6;
 
 function DisplayTable(pokemonData)
 {
@@ -31,7 +31,7 @@ function DisplayTable(pokemonData)
                                     <ReactTooltip
                                         id="my-tooltip-1"
                                         place="bottom"
-                                        content= <p>Height: {singlePokemon.height }  Weight: {singlePokemon.weight}</p>
+                                        content=<p>Height: {singlePokemon.height }  Weight: {singlePokemon.weight}</p>
                                     />
                                 </td>
                                 <td key={id+2}>{singlePokemon.pokemonName.charAt(0).toUpperCase() + singlePokemon.pokemonName.slice(1,singlePokemon.pokemonName.length)}</td>
@@ -82,27 +82,9 @@ function Table(){
     useEffect(() => {
         if (namesFetched)
         {
-            fetchAbilitesAndSprites(pokemons.results).then((results) =>
-                {
-                    //full data (name, sprite, height,weight and abilities)
-                    //setPokemonData(results[0]);
-                    //define number of pages
-                    const numberOfPages = Math.round(results[0].length / itemsPerPage);
-                    var pages = [];
-                    var singlePage = []; 
-                    var count = 0;                  
-                    for (let i = 0; i < results[0].length; i++) {
-                        singlePage.push(results[0][i]);
-                        if ((i+1) % itemsPerPage == 0 )   
-                        {
-                            count += itemsPerPage;
-                            pages.push(singlePage);
-                            singlePage = []
-                        }                  
-                    }
-                    TODO: //this causes issues when number of items and number of items is exactly divisible
-                    if (count != results[0].length) pages.push(results[0].slice(count,results[0].length));
-                    setPokemonData(pages);
+            fetchFullPokemonData(pokemons.results, itemsPerPage).then((results) =>
+                {                    
+                    setPokemonData(results[0]);
                     setCurrentPage(0);
                     setAllDataFetched(results[1]);
                 }
