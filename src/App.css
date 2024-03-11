@@ -40,11 +40,13 @@
 table{
   border-collapse: collapse;
   text-align: center;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
 }
 tr{
   background-color: #CDDCFA;
   margin: 0;
   border-bottom: 1px solid white;
+  
 }
 
 body{
@@ -67,4 +69,21 @@ th{
 #root{
   padding: 5vw 2vw 2vw 5vw;
   min-height: 100vh;
+}
+.custom-buttons{
+  padding-top: 1vw;
+  display: flex;
+  justify-content: space-between;
+}
+
+button{
+  border: 0;
+  border-radius: 10%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  background-color: #81CBAC;
+  color: white;
 }

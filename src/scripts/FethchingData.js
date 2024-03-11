@@ -1,13 +1,12 @@
 import axios from "axios";
 
 //runs the URL from fetchDataFromApi() and uses single pokemons' data
-async function fetchAbilitesAndSprites(data) {
+async function fetchFullPokemonData(data) {
     try{
         var tempPokemons = []
         for (let index = 0; index < data.length; index++) {
             var name = data[index].name;
             const responseNew = await axios.get(data[index].url); 
-            console.log(responseNew.data);
             tempPokemons.push(
             {
               sprite: responseNew.data.sprites.front_default,
@@ -35,4 +34,4 @@ async function fetchDataFromApi(apiUrl) {
 
   };
 
-export {fetchAbilitesAndSprites, fetchDataFromApi};
+export {fetchFullPokemonData as fetchAbilitesAndSprites, fetchDataFromApi};

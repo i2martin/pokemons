@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
-import Pagination from 'react-bootstrap/Pagination';
 import {fetchAbilitesAndSprites, fetchDataFromApi} from "../scripts/FethchingData";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import LoadingSpinner from "./LoadingSpinner";
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
+const itemsPerPage = 6;
 
 function DisplayTable(pokemonData)
 {
@@ -54,6 +54,23 @@ function Table(){
     var [namesFetched, setNamesFetched] = React.useState(false);
     //indicates data's ready to be displayed (full pokemon info)
     var [allDataFetched, setAllDataFetched] = React.useState(false);
+    var [currentPage, setCurrentPage] = React.useState(null);
+
+    function previousPage()
+    {
+        if (currentPage != 0)
+        {
+            setCurrentPage(currentPage - 1);
+        }
+    }
+
+    function nextPage()
+    {
+        if (currentPage < pokemonData.length)
+        {
+            setCurrentPage(currentPage + 1);
+        }
+    }
     useEffect(() => {
           fetchDataFromApi(apiUrl).then((response) =>
           {
@@ -63,27 +80,51 @@ function Table(){
           );
         }, []);
 
-      useEffect(() => {
+    useEffect(() => {
         if (namesFetched)
         {
             fetchAbilitesAndSprites(pokemons.results).then((results) =>
                 {
-                    setPokemonData(results[0]);
+                    //full data (name, sprite, height,weight and abilities)
+                    //setPokemonData(results[0]);
+                    //define number of pages
+                    const numberOfPages = Math.round(results[0].length / itemsPerPage);
+                    var pages = [];
+                    var singlePage = []; 
+                    var count = 0;    
+                    //console.log(results[0][0])               
+                    for (let i = 0; i < results[0].length; i++) {
+                        singlePage.push(results[0][i]);
+                        if ((i+1) % itemsPerPage == 0 )   
+                        {
+                            count += itemsPerPage;
+                            pages.push(singlePage);
+                            singlePage = []
+                        }                  
+                    }
+                    TODO: //this causes issues when number of items and number of items is exactly divisible
+                    pages.push(results[0].slice(count,results[0].length))
+                    setPokemonData(pages);
+                    setCurrentPage(0);
                     setAllDataFetched(results[1]);
                 }
             );
         }  
       }, [namesFetched]);
-
-      return ( 
+    return ( 
         <div>
-             {namesFetched && allDataFetched ? 
-             DisplayTable(pokemonData)       
+             {namesFetched && allDataFetched ?          
+             <>              
+                {DisplayTable(pokemonData[currentPage])}
+                <div className="custom-buttons">
+                    <button onClick={previousPage}>Previous</button>
+                    <button onClick={nextPage}>Next</button>
+                </div>
+            </>
              : 
                 <LoadingSpinner />
             }
         </div>
-      ) 
+    ) 
 }
-
 export default Table;
