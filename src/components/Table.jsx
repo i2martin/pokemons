@@ -4,7 +4,7 @@ import { Tooltip as ReactTooltip } from "react-tooltip";
 import LoadingSpinner from "./LoadingSpinner";
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
-const itemsPerPage = 6;
+const itemsPerPage = 3;
 
 function DisplayTable(pokemonData)
 {
@@ -42,7 +42,6 @@ function DisplayTable(pokemonData)
             </tbody>
         </table>
     );
- 
 }
 
 function Table(){
@@ -66,7 +65,7 @@ function Table(){
 
     function nextPage()
     {
-        if (currentPage < pokemonData.length)
+        if (currentPage < pokemonData.length - 1)
         {
             setCurrentPage(currentPage + 1);
         }
@@ -91,8 +90,7 @@ function Table(){
                     const numberOfPages = Math.round(results[0].length / itemsPerPage);
                     var pages = [];
                     var singlePage = []; 
-                    var count = 0;    
-                    //console.log(results[0][0])               
+                    var count = 0;                  
                     for (let i = 0; i < results[0].length; i++) {
                         singlePage.push(results[0][i]);
                         if ((i+1) % itemsPerPage == 0 )   
@@ -103,7 +101,7 @@ function Table(){
                         }                  
                     }
                     TODO: //this causes issues when number of items and number of items is exactly divisible
-                    pages.push(results[0].slice(count,results[0].length))
+                    if (count != results[0].length) pages.push(results[0].slice(count,results[0].length));
                     setPokemonData(pages);
                     setCurrentPage(0);
                     setAllDataFetched(results[1]);
