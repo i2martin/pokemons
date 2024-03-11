@@ -7,12 +7,16 @@ async function fetchAbilitesAndSprites(data) {
         for (let index = 0; index < data.length; index++) {
             var name = data[index].name;
             const responseNew = await axios.get(data[index].url); 
-            var object = {
-                sprite: responseNew.data.sprites.front_default,
-                pokemonName: name,
-                pokemonAbilities : [responseNew.data.abilities]              
+            console.log(responseNew.data);
+            tempPokemons.push(
+            {
+              sprite: responseNew.data.sprites.front_default,
+              pokemonName: name,
+              pokemonAbilities : [responseNew.data.abilities], 
+              height: responseNew.data.height,
+              weight: responseNew.data.weight
             }  
-            tempPokemons.push(object);                       
+          );                       
         }
         return [tempPokemons, true];
     }

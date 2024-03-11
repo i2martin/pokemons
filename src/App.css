@@ -66,4 +66,5 @@ th{
 
 #root{
   padding: 5vw 2vw 2vw 5vw;
+  min-height: 100vh;
 }

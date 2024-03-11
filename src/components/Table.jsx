@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import Pagination from 'react-bootstrap/Pagination';
 import {fetchAbilitesAndSprites, fetchDataFromApi} from "../scripts/FethchingData";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import LoadingSpinner from "./LoadingSpinner";
 
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
 
@@ -19,10 +20,9 @@ function DisplayTable(pokemonData)
             <tbody key={1}>
                 {pokemonData.map((singlePokemon, id = 0) =>
                     {   
-                        let abilities = [], ability = "";    
+                        let abilities = [];   
                         abilities = singlePokemon.pokemonAbilities[0].map(abilityObj => {
-                            const abilityName = abilityObj.ability.name;
-                            return abilityName.charAt(0).toUpperCase() + abilityName.slice(1);
+                            return abilityObj.ability.name.charAt(0).toUpperCase() + abilityObj.ability.name.slice(1);
                         }).join(', ');
                         return(
                             <tr key={id}>
@@ -30,8 +30,8 @@ function DisplayTable(pokemonData)
                                     <img data-tooltip-id="my-tooltip-1" src={singlePokemon.sprite} alt={singlePokemon.pokemonName} />
                                     <ReactTooltip
                                         id="my-tooltip-1"
-                                        place="top"
-                                        content="Dummy info"
+                                        place="bottom"
+                                        content= <p>Height: {singlePokemon.height }  Weight: {singlePokemon.weight}</p>
                                     />
                                 </td>
                                 <td key={id+2}>{singlePokemon.pokemonName.charAt(0).toUpperCase() + singlePokemon.pokemonName.slice(1,singlePokemon.pokemonName.length)}</td>
@@ -80,9 +80,7 @@ function Table(){
              {namesFetched && allDataFetched ? 
              DisplayTable(pokemonData)       
              : 
-             <p>
-                No data to display at the moment.
-            </p>
+                <LoadingSpinner />
             }
         </div>
       ) 
