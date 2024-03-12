@@ -6,13 +6,13 @@ import LoadingSpinner from "./LoadingSpinner";
 const apiUrl = 'https://pokeapi.co/api/v2/pokemon'
 const itemsPerPage = 6;
 
-function DisplayTable(pokemonData, {onSort})
+function DisplayTable(pokemonData, {direction, onSort})
 {
     return (
         <table key={1}>
             <thead>
                 <tr>
-                    <th className="sort-button" onClick={() => {onSort()}}>IMAGE</th>
+                    <th className="sort-button" onClick={() => {onSort()}}>{"IMAGE" + direction}</th>
                     <th>NAME</th>
                     <th>ABILITIES</th>
                 </tr>
@@ -53,30 +53,33 @@ function Table(){
     var [pokemons, setPokemons] = React.useState(null);
     //full pokemon info to be stored and managed here
     var [pokemonData, setPokemonData] = React.useState(null);
+    //full pokemon info to be stored and managed here
+    var [sortedAscPokemonData, setSortedAscPokemonData] = React.useState(null);
+    //full pokemon info to be stored and managed here
+    var [sortedDescPokemonData, setSortedDescPokemonData] = React.useState(null);
     //by default there's no pokemon data to display
     var [namesFetched, setNamesFetched] = React.useState(false);
     //indicates data's ready to be displayed (full pokemon info)
     var [allDataFetched, setAllDataFetched] = React.useState(false);
+    //manages current page --> default is null / later set to 0
     var [currentPage, setCurrentPage] = React.useState(null);
+    //state that manages if sorting was requested --> by height
     var [sortedPage, setSortedPage] = React.useState("unsorted"); 
+    //state that manages sort direction
+    var [sortDirection, setSortDirection] = React.useState("");
     
 
     function sortData() {
         //setSortedPage(!sortedPage); // Toggle sorted state
-        if (sortedPage === "unsorted" || sortedPage === "descending") { 
-            setSortedPage("ascending");
-            console.log(pokemonData)
-            const sortedData = [...pokemonData[currentPage]].sort((a, b) => a.height - b.height);
-            const newPokemonData = [...pokemonData];
-            newPokemonData[currentPage] = sortedData;
-            setPokemonData(newPokemonData);
+        if (sortedPage === "unsorted" || sortedPage === "ascending") { 
+            setSortedPage("descending")
+            setPokemonData(sortedAscPokemonData);
+            setSortDirection(" ↓")
         } else {
             //reverse sort
-            setSortedPage("descending");
-            const reversedData = [...pokemonData[currentPage]].reverse();
-            const newPokemonData = [...pokemonData];
-            newPokemonData[currentPage] = reversedData;
-            setPokemonData(newPokemonData);
+            setSortedPage("ascending");
+            setPokemonData(sortedDescPokemonData);
+            setSortDirection(" ↑")
         }
     }
     
@@ -112,6 +115,8 @@ function Table(){
                     setPokemonData(results[0]);
                     setCurrentPage(0);
                     setAllDataFetched(results[1]);
+                    setSortedAscPokemonData(results[2]);
+                    setSortedDescPokemonData(results[3]);
                 }
             );
         }  
@@ -120,7 +125,7 @@ function Table(){
         <div>
              {namesFetched && allDataFetched ?          
              <>              
-                {DisplayTable(pokemonData[currentPage], {onSort: sortData})}
+                {DisplayTable(pokemonData[currentPage], {direction: sortDirection, onSort: sortData})}
                 <div className="custom-buttons">
                     <button onClick={previousPage}>Previous</button>
                     <button onClick={nextPage}>Next</button>

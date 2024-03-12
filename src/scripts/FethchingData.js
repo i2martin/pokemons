@@ -5,6 +5,8 @@ async function fetchFullPokemonData(data, itemsPerPage) {
     try{
         var tempPokemons = []
         var pages = [];
+        const pagesAscending = []
+        const pagesDescending = []
         for (let index = 0; index < data.length; index++) {
             var name = data[index].name;
             const responseNew = await axios.get(data[index].url); 
@@ -17,13 +19,17 @@ async function fetchFullPokemonData(data, itemsPerPage) {
               weight: responseNew.data.weight
             }  
           );                       
-        }    
+        }
+        const sortedAscending = [...tempPokemons].sort((a,b) => a.height - b.height);
+        const sortedDescending = [...tempPokemons].sort((a,b) => a.height - b.height).reverse();
         for (let i = 0; i < tempPokemons.length; i += itemsPerPage) {
           // Slice the tempPokemons array from the current index i up to i + itemsPerPage
           // and push this sub-array into the pages array.
           pages.push(tempPokemons.slice(i, i + itemsPerPage));
+          pagesAscending.push(sortedAscending.slice(i, i + itemsPerPage));
+          pagesDescending.push(sortedDescending.slice(i, i + itemsPerPage));
         }
-        return [pages, true];
+        return [pages, true, pagesAscending, pagesDescending];
     }
     catch(error){
         console.error("Problems reaching API endpoint." + error);   
