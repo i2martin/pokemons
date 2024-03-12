@@ -87,3 +87,8 @@ button{
   background-color: #81CBAC;
   color: white;
 }
+
+.sort-button
+{
+  cursor: pointer;
+}

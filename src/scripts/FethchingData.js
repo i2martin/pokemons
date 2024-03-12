@@ -5,8 +5,6 @@ async function fetchFullPokemonData(data, itemsPerPage) {
     try{
         var tempPokemons = []
         var pages = [];
-        var singlePage = []; 
-        var count = 0;  
         for (let index = 0; index < data.length; index++) {
             var name = data[index].name;
             const responseNew = await axios.get(data[index].url); 
@@ -19,7 +17,7 @@ async function fetchFullPokemonData(data, itemsPerPage) {
               weight: responseNew.data.weight
             }  
           );                       
-        }             
+        }    
         for (let i = 0; i < tempPokemons.length; i += itemsPerPage) {
           // Slice the tempPokemons array from the current index i up to i + itemsPerPage
           // and push this sub-array into the pages array.
